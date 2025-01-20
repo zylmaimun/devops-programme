@@ -49,43 +49,42 @@ pipeline {
             steps {
                 sh "trivy fs . > trivyfs.txt"
              }
-        }
-        stage("Build & Push Docker Image") {
-            steps {
-                script {
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
-                    }
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
-                    }
-                }
-            }
-        }
-        stage("Trivy Image Scan") {
-            steps {
-                script {
-	                 sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image zylmaimun/devops-programme-app:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
-                }
-            }
-        }
-        stage ('Cleanup Artifacts') {
-            steps {
-                script {
-                     sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
-                     sh "docker rmi ${IMAGE_NAME}:latest"
-                }
-            }
-        }
-	stage("Trigger CD Pipeline") {
+         }
+         stage("Build & Push Docker Image") {
+             steps {
+                 script {
+                     docker.withRegistry('',DOCKER_PASS) {
+                         docker_image = docker.build "${IMAGE_NAME}"
+                     }
+                     docker.withRegistry('',DOCKER_PASS) {
+                         docker_image.push("${IMAGE_TAG}")
+                         docker_image.push('latest')
+                     }
+                  }
+             }
+         }
+         stage("Trivy Image Scan") {
+             steps {
+                 script {
+	              sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image zylmaimun/devops-programme-app:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
+                 }
+             }
+         }
+         stage ('Cleanup Artifacts') {
+             steps {
+                 script {
+                      sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                      sh "docker rmi ${IMAGE_NAME}:latest"
+                  }
+             }
+         }
+	 stage("Trigger CD Pipeline") {
             steps {
                 script {
                     sh "curl -v -k --user clouduser:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-3-122-51-99.eu-central-1.compute.amazonaws.com:8080/job/devops-programme-CD/buildWithParameters?token=gitops-token'"
                 }
             }
-        }
-     }
+         }
     }
     post {
        always {
@@ -96,6 +95,7 @@ pipeline {
                   "URL: ${env.BUILD_URL}<br/>",
               to: 'simeon.k.sabev@gmail.com',                              
               attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+          } 
        }
-    }
+
 }
