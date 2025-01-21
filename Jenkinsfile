@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        APP_NAME = "devops-programme-app"
+        APP_NAME = "devops-programme-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "zylmaimun"
         DOCKER_PASS = 'dockerhub'
@@ -66,7 +66,7 @@ pipeline {
          stage("Trivy Image Scan") {
              steps {
                  script {
-	              sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image zylmaimun/devops-programme-app:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
+	              sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image zylmaimun/devops-programme-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
                  }
              }
          }
