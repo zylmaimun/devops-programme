@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        APP_NAME = "devops-programme-pipeline"
+        APP_NAME = "devops-programme-app"
         RELEASE = "1.0.0"
         DOCKER_USER = "zylmaimun"
         DOCKER_PASS = 'dockerhub'
